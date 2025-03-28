@@ -31,23 +31,23 @@ def prompt(interest1, interest2):
             {
                 "role": "user",
                 "content": f"""
-        		"### INSTRUCTION ###
-            Generate ONLY the icebreaker question itself with:
-            - No 'Person 1/Person 2' labels
-            - No introductory phrases
-            - No explanations
-            - Under 15 words
+        "### INSTRUCTION ###
+        Generate ONLY the icebreaker question itself with:
+        - No 'Person 1/Person 2' labels
+        - No introductory phrases
+        - No explanations
+        - Under 15 words
 
-            ### INTERESTS ###
-            - Interest A: [{interest1}]
-            - Interest B: [{interest2}]
+        ### INTERESTS ###
+        - Interest A: [{interest1}]
+        - Interest B: [{interest2}]
 
-            ### QUESTION FORMAT ###
-            How [related concept] compare [related concept]?
+        ### QUESTION FORMAT ###
+        How [related concept] compare [related concept]?
 
-            ### OUTPUT ###
-        "
-        	Generate exactly one icebreaker question for two people with separate interests:
+        ### OUTPUT ###
+        
+        Generate exactly one icebreaker question for two people with separate interests:
         - Person A loves [{interest1}]
         - Person B loves [{interest2}]
 
@@ -99,7 +99,7 @@ def delete_room(request, room_code):
         room.delete()
         return Response({'code': 200})
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_room(request, username, room_code):
@@ -108,7 +108,7 @@ def get_room(request, username, room_code):
         room = user.room_set.get(code=room_code)
         return Response({'code': 200, 'room_name': room.name})
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def add_participant(request, room_code):
@@ -119,7 +119,7 @@ def add_participant(request, room_code):
         room.participant_set.create(name=participant_name, interests=participant_interests)
         return Response(status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
 def delete_participant(request, room_code, name):
@@ -129,7 +129,7 @@ def delete_participant(request, room_code, name):
         participant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def create_pairings(request, room_code):
@@ -147,20 +147,20 @@ def create_pairings(request, room_code):
             interest1 = participant1.interests[0]
             interest2 = participant2.interests[0]
             icebreaker = prompt(interest1, interest2)
-            room.pairing_set.create(participant1=participant1, participant2=participant2, icebreaker=icebreaker)
+            room.pairing_set.create(participant1=participant1.name, participant2=participant2.name, icebreaker=icebreaker)
 
         return Response(status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_pairings(request, room_code, name):
     try:
         room = Room.objects.get(code=room_code)
-        pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))
+        pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))[0]
         if pairing.participant1 == name:
             return Response({"partner":pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
         else:
             return Response({"partner":pairing.participant1, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
