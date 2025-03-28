@@ -211,12 +211,8 @@ def create_pairings(request, room_code):
 def get_pairings(request, room_code, name):
     try:
         room = Room.objects.get(code=room_code)
-        # try:
-        #     pairing = Pairing.objects.get(room=room, participant1=name)
-        # except Pairing.DoesNotExist:
-        #     pairing = Pairing.objects.get(room=room, participant2=name)
-        pairing = room.pairing_set.all()
-        for pairing in pairing:
+        pairings = room.pairing_set.all()
+        for pairing in pairings:
             if pairing.participant1 == name:
                 return Response({"partner":pairing.participant2,
                                  "image":base_url+room_code+"&"+pairing.participant2,
