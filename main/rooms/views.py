@@ -6,6 +6,7 @@ import environ
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render
+from drf_yasg.utils import swagger_auto_schema
 from google.cloud import storage
 from google.oauth2 import service_account
 from openai import OpenAI
@@ -38,7 +39,12 @@ creds = {
 base_url = "https://storage.googleapis.com/images21307/"
 
 
-# Create your views here.
+@swagger_auto_schema(method='POST',
+                     operation_id='create_room',
+                     operation_description="""
+                     Creates a room with passed room_name associated with the username also passed. generates a random
+                     number between 10,000 and 99,999 to be used as the room's room_code
+                     """)
 @api_view(['POST'])
 def create_room(request, username, room_name):
     try:
@@ -49,6 +55,11 @@ def create_room(request, username, room_name):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status= status.HTTP_404_NOT_FOUND)
 
+@swagger_auto_schema(method='DELETE',
+                     operation_id='delete_room',
+                     operation_description="""
+                     Deletes the room associated with the passed room_code.
+                     """)
 @api_view(['DELETE'])
 def delete_room(request, room_code):
     try:
@@ -70,6 +81,12 @@ def delete_room(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='GET',
+                     operation_id='get_room',
+                     operation_description="""
+                     Creates a room with passed room_name associated with the username also passed. generates a random
+                     number between 10,000 and 99,999 to be used as the room's room_code
+                     """)
 @api_view(['GET'])
 def get_room(request, room_code):
     try:
@@ -155,9 +172,9 @@ def get_pairings(request, room_code, name):
         room = Room.objects.get(code=room_code)
         pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))[0]
         if pairing.participant1 == name:
-            return Response({"partner":pairing.participant2, "picture":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant2, "image":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
         else:
-            return Response({"partner":pairing.participant1, "picture":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant1, "image":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -186,7 +203,8 @@ def get_all_participants(request, room_code):
         for participant in participants:
             participant_list.append({
                 "name":participant.name,
-                "interests":participant.interests
+                "interests":participant.interests,
+                "image":base_url+room_code+"&"+participant.name,
             })
         return Response({"participants":participant_list}, status=status.HTTP_200_OK)
     except Exception as e:
