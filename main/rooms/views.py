@@ -200,7 +200,8 @@ def get_all_rooms(request, username):
         rooms = user.room_set.all()
         room_list = []
         for room in rooms:
-            room_list.append(room.code)
+            room_list.append({"room_name":room.name,
+                              "code": room.code})
         return Response({"rooms":room_list}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
