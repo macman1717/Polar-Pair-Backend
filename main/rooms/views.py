@@ -1,4 +1,5 @@
 import os
+import random
 from random import randint
 
 import environ
@@ -11,6 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Participant, Room, Pairing
+from .serializers import PairingSerializer
 
 env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -136,7 +138,8 @@ def create_pairings(request, room_code):
     try:
         room = Room.objects.get(code=room_code)
         Pairing.objects.filter(room=room).delete()
-        participants = Participant.objects.filter(room=room)
+        participants = list(Participant.objects.filter(room=room))
+        random.shuffle(participants)
         index = 0
         while index < len(participants):
             participant1 = participants[index]
@@ -144,8 +147,13 @@ def create_pairings(request, room_code):
             participant2 = participants[index]
             index += 1
 
-            interest1 = participant1.interests[0]
-            interest2 = participant2.interests[0]
+            interests = participant1.interests
+            random.shuffle(interests)
+            interest1 = interests[0]
+            interests = participant2.interests
+            random.shuffle(interests)
+            interest2 = interests[0]
+
             icebreaker = prompt(interest1, interest2)
             room.pairing_set.create(participant1=participant1.name, participant2=participant2.name, icebreaker=icebreaker)
 
@@ -162,5 +170,36 @@ def get_pairings(request, room_code, name):
             return Response({"partner":pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
         else:
             return Response({"partner":pairing.participant1, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_all_pairings(request, room_code):
+    try:
+        room = Room.objects.get(code=room_code)
+        pairings = room.pairing_set.all()
+        pairings_list = []
+        for pairing in pairings:
+            pairings_list.append({
+                "Person A": pairing.participant1,
+                "Person B": pairing.participant2,
+                "icebreaker": pairing.icebreaker
+            })
+        return Response({"pairings":pairings_list}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_all_participants(request, room_code):
+    try:
+        room = Room.objects.get(code=room_code)
+        participants = room.participant_set.all()
+        participant_list = []
+        for participant in participants:
+            participant_list.append({
+                "name":participant.name,
+                "interests":participant.interests
+            })
+        return Response({"participants":participant_list}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)

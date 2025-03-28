@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from main.rooms.models import Room, Pairing
+from .models import Room, Pairing
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -11,4 +11,4 @@ class RoomSerializer(serializers.ModelSerializer):
 class PairingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pairing
-        fields = ['participants1', 'participants2','icebreaker']
+        fields = ['participant1', 'participant2','icebreaker']
