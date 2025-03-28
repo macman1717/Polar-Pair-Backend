@@ -212,6 +212,8 @@ def get_pairings(request, room_code, name):
     try:
         room = Room.objects.get(code=room_code)
         pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))[0]
+        print(pairing.participant1)
+        print(pairing.participant2)
         if pairing.participant1 == name:
             return Response({"partner":pairing.participant2,
                              "image":base_url+room_code+"&"+pairing.participant2,
