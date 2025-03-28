@@ -54,6 +54,18 @@ def delete_room(request, room_code):
     try:
         room = Room.objects.get(code=room_code)
         room.delete()
+
+        credentials = service_account.Credentials.from_service_account_info(creds)
+        client = storage.Client(credentials=credentials, project=creds["project_id"])
+
+        bucket = client.get_bucket('images21307')
+        blobs_to_delete = []
+        for blob in bucket.list_blobs():
+            if blob.name.startswith(f"{room_code}&"):
+                blobs_to_delete.append(blob)
+
+        if blobs_to_delete:
+            bucket.delete_blobs(blobs_to_delete)
         return Response({'code': 200})
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -70,16 +82,24 @@ def get_room(request, username, room_code):
 @api_view(['POST'])
 def add_participant(request, room_code):
     participant_name = request.data.get('name')
-    participant_interests = request.data.get('interests')
+    interests = request.data.get('interests')
+    participant_interests = interests.split(',')
+    image_file = request.data.get('image')
 
-    credentials = service_account.Credentials.from_service_account_info(creds)
-    client = storage.Client(credentials=credentials, project=creds["project_id"])
 
-    bucket = client.get_bucket('images21307')
-    filename = room_code + "&" + participant_name
     try:
+        credentials = service_account.Credentials.from_service_account_info(creds)
+        client = storage.Client(credentials=credentials, project=creds["project_id"])
+
+        bucket = client.get_bucket('images21307')
+        filename = room_code + "&" + participant_name
+        blob = bucket.blob(filename)
+
         room = Room.objects.get(code=room_code)
         room.participant_set.create(name=participant_name, interests=participant_interests)
+
+        blob.upload_from_file(file_obj=image_file, content_type='image/png')
+
         return Response(status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
@@ -89,6 +109,13 @@ def delete_participant(request, room_code, name):
     try:
         room = Room.objects.get(code=room_code)
         participant = room.participant_set.get(name=name)
+
+        filename = room_code + "&" + name
+        credentials = service_account.Credentials.from_service_account_info(creds)
+        client = storage.Client(credentials=credentials, project=creds["project_id"])
+        bucket = client.get_bucket('images21307')
+        blob = bucket.blob(filename)
+        blob.delete()
         participant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
@@ -129,9 +156,9 @@ def get_pairings(request, room_code, name):
         room = Room.objects.get(code=room_code)
         pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))[0]
         if pairing.participant1 == name:
-            return Response({"partner":pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant2, "picture":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
         else:
-            return Response({"partner":pairing.participant1, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant1, "picture":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
