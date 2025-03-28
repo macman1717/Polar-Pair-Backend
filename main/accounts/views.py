@@ -27,7 +27,7 @@ def login(request):
     try:
         user = User.objects.get(username=username)
         if user.check_password(password):
-            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+            return Response({"username":user.username}, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
