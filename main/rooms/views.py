@@ -357,5 +357,6 @@ def confirm_pairings(request, room_code):
         for pairing in pairings:
             pairing.confirmed = True
             pairing.save()
+        return Response(status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
