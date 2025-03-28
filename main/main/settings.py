@@ -54,6 +54,7 @@ CORS_ALLOW_METHODS = (
 
 INSTALLED_APPS = [
     "corsheaders",
+    'prompts.apps.PromptsConfig',
     "main.apps.MongoAdminConfig",
     "main.apps.MongoAuthConfig",
     "main.apps.MongoContentTypesConfig",
@@ -61,7 +62,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'prompts.apps.PromptsConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
