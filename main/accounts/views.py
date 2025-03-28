@@ -21,7 +21,7 @@ def signup(request):
     except IntegrityError:
         return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(method='POST', operation_description="expects a request body like {'username':'Macman17', 'password':'abc123'}. Returns response code 200 if user created successfully and 400 if an error occurred with a repr(exception_")
+@swagger_auto_schema(method='POST', operation_description="expects a request body like {'username':'Macman17', 'password':'abc123'}. Returns username if login was successful and 400 if an error occurred with 'Invalid Username or Password'")
 @api_view(['POST'])
 def login(request):
     data = request.data

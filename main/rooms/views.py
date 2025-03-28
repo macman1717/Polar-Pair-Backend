@@ -71,7 +71,7 @@ def delete_room(request, room_code):
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_room(reques, room_code):
+def get_room(request, room_code):
     try:
         room = Room.objects.get(code=room_code)
         return Response({'code': 200, 'room_name': room.name})
