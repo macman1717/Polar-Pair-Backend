@@ -272,10 +272,10 @@ def get_all_rooms(request, username):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['DELETE'])
-def delete_all_rooms(request):
-    Room.objects.all().delete()
-    return Response("Thumbs Up!")
+# @api_view(['DELETE'])
+# def delete_all_rooms(request):
+#     Room.objects.all().delete()
+#     return Response("Thumbs Up!")
 
 def prompt(interest1, interest2):
     token = env("HUGGING_FACE_TOKEN")
