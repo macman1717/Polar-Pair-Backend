@@ -335,3 +335,14 @@ def prompt(interest1, interest2):
         prompt_response += message.choices[0].delta.content
 
     return prompt_response
+
+@api_view(['POST'])
+def confirm_pairings(request, room_code):
+    room = Room.objects.get(code=room_code)
+    try:
+        pairings = room.pairing_set.all()
+        for pairing in pairings:
+            pairing.confirmed = True
+            pairing.save()
+    except Exception as e:
+        return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)

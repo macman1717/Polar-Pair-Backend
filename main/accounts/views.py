@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from tutorial.quickstart.serializers import UserSerializer
 
 
+
+
 # Create your views here.
 @swagger_auto_schema(method='POST', operation_description="expects a request body like {'username':'Macman17', 'password':'abc123'}. Returns response code 200 if user created successfully and 400 if an error occurred with a repr(exception_")
 @api_view(['POST'])
@@ -34,3 +36,6 @@ def login(request):
         return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+

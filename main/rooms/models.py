@@ -22,3 +22,4 @@ class Pairing(models.Model):
     participant1 = models.TextField()
     participant2 = models.TextField()
     icebreaker = models.TextField()
+    confirmed = models.BooleanField(default=False)
