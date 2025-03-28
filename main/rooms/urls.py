@@ -15,5 +15,5 @@ urlpatterns = [
     path('pairings/create/<str:room_code>', views.create_pairings, name='create_pairing'),
     path('pairings/all/<str:room_code>', views.get_all_pairings, name='all_pairings'),
     path('pairings/<str:room_code>/<str:name>', views.get_pairings, name='get_pairings'),
-    path('DONT-USE-THIS-ENDPOINT-PLEASE', views.delete_all_rooms)
+    # path('DONT-USE-THIS-ENDPOINT-PLEASE', views.delete_all_rooms)
 ]
