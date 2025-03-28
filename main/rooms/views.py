@@ -58,7 +58,8 @@ def create_room(request, username, room_name):
 @swagger_auto_schema(method='DELETE',
                      operation_id='delete_room',
                      operation_description="""
-                     Deletes the room associated with the passed room_code.
+                     Deletes the room associated with the passed room_code. Deletes all associated participants and pairings.
+                     from mongo and deletes all associated images from Google Cloud Storage.
                      """)
 @api_view(['DELETE'])
 def delete_room(request, room_code):
@@ -84,8 +85,8 @@ def delete_room(request, room_code):
 @swagger_auto_schema(method='GET',
                      operation_id='get_room',
                      operation_description="""
-                     Creates a room with passed room_name associated with the username also passed. generates a random
-                     number between 10,000 and 99,999 to be used as the room's room_code
+                     Used for verifying that a participant is trying to join an existing room. Returns room name if
+                     successful and an error messege if not
                      """)
 @api_view(['GET'])
 def get_room(request, room_code):
@@ -95,6 +96,17 @@ def get_room(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='post',
+                     operation_id='add_participant',
+                     operation_description="""
+                     adds a participant to the room associated with the passed room_code. expects request body to be a form like
+                     {
+                        "name":"Connor",
+                        "interest":"Redbull,Golf,Video Games",
+                        "image_file": (uploaded image)
+                    }
+                    inserts a document into the Participants collection and uploads the image to Google Cloud Storage
+                     """)
 @api_view(['POST'])
 def add_participant(request, room_code):
     participant_name = request.data.get('name')
@@ -120,6 +132,13 @@ def add_participant(request, room_code):
     except Exception as e:
         return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+@swagger_auto_schema(method='DELETE',
+                     operation_id='delete_participant',
+                     operation_description="""
+                     Deletes the participant associated with the passed room_code and name. This includes data
+                     in mongo and Google Cloud Storage.
+                     """)
 @api_view(['DELETE'])
 def delete_participant(request, room_code, name):
     try:
@@ -137,6 +156,13 @@ def delete_participant(request, room_code, name):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='POST',
+                     operation_id='create_pairings',
+                     operation_description="""
+                     Expect this endpoint to take a long time to fulfill request
+                     Generates pairings for the associated room. If successful, returns 200, signaling that the database
+                     is ready to handle get requests for pairing. 
+                     """)
 @api_view(['POST'])
 def create_pairings(request, room_code):
     try:
@@ -166,6 +192,12 @@ def create_pairings(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='get',
+                     operation_id='get_pairing',
+                     operation_description="""
+                     returns pairings associated with the room + name. Used by participants to see who they were paired
+                     with and the icebreaker for the current round.
+                     """)
 @api_view(['GET'])
 def get_pairings(request, room_code, name):
     try:
@@ -178,6 +210,12 @@ def get_pairings(request, room_code, name):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='get',
+                     operation_id='get_all_pairings',
+                     operation_description="""
+                     returns all pairings for the current round for associated room. Used by the owner of the room
+                     to ensure that icebreaker generation is working correctly
+                     """)
 @api_view(['GET'])
 def get_all_pairings(request, room_code):
     try:
@@ -194,6 +232,12 @@ def get_all_pairings(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='get',
+                     operation_id='get_all_participants',
+                     operation_description="""
+                     returns all participants for the associate droom. Used by the owner of the room to be able to view
+                     everyone currently in the room as well as selecting targets for deletion
+                     """)
 @api_view(['GET'])
 def get_all_participants(request, room_code):
     try:
@@ -210,6 +254,11 @@ def get_all_participants(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+@swagger_auto_schema(method='get',
+                     operation_id='get_all_rooms',
+                     operation_description="""
+                     returns all the room ids and names for the user with passed username.
+                     """)
 @api_view(['GET'])
 def get_all_rooms(request, username):
     try:
@@ -222,6 +271,11 @@ def get_all_rooms(request, username):
         return Response({"rooms":room_list}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_all_rooms(request):
+    Room.objects.all().delete()
+    return Response("Thumbs Up!")
 
 def prompt(interest1, interest2):
     token = env("HUGGING_FACE_TOKEN")

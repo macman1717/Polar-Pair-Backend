@@ -14,6 +14,9 @@ class Participant(models.Model):
     name = models.TextField()
     interests = ArrayField(models.TextField())
 
+    class Meta:
+        unique_together = ("room", "name")
+
 class Pairing(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     participant1 = models.TextField()
