@@ -55,6 +55,8 @@ CORS_ALLOW_METHODS = (
 INSTALLED_APPS = [
     "corsheaders",
     'prompts.apps.PromptsConfig',
+    'rooms.apps.RoomsConfig',
+    'accounts.apps.AccountsConfig',
     "main.apps.MongoAdminConfig",
     "main.apps.MongoAuthConfig",
     "main.apps.MongoContentTypesConfig",
