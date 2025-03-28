@@ -192,8 +192,10 @@ def create_pairings(request, room_code):
             pairings_list = []
             for pairing in pairings:
                 pairings_list.append({
-                    "Person A": pairing.participant1,
-                    "Person B": pairing.participant2,
+                    "Person1": pairing.participant1,
+                    "Person1_image": base_url+room_code+"&"+pairing.participant1,
+                    "Person2": pairing.participant2,
+                    "Person2_image":base_url+room_code+"&"+pairing.participant2,
                     "icebreaker": pairing.icebreaker
                 })
             return Response({"pairings": pairings_list}, status=status.HTTP_200_OK)
@@ -242,8 +244,10 @@ def get_all_pairings(request, room_code):
         pairings_list = []
         for pairing in pairings:
             pairings_list.append({
-                "Person A": pairing.participant1,
-                "Person B": pairing.participant2,
+                "Person1": pairing.participant1,
+                "Person1_image": base_url+room_code+"&"+pairing.participant1,
+                "Person2": pairing.participant2,
+                "Person2_image":base_url+room_code+"&"+pairing.participant2,
                 "icebreaker": pairing.icebreaker
             })
         return Response({"pairings":pairings_list}, status=status.HTTP_200_OK)
