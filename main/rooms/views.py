@@ -153,7 +153,8 @@ def create_pairings(request, room_code):
             interests = participant2.interests
             random.shuffle(interests)
             interest2 = interests[0]
-
+            if interest1 == interest2:
+                interest2 = interests[1]
             icebreaker = prompt(interest1, interest2)
             room.pairing_set.create(participant1=participant1.name, participant2=participant2.name, icebreaker=icebreaker)
 
