@@ -82,5 +82,7 @@ def hello_world(request, interest1, interest2):
 
     return Response(prompt_response)
 
-
+@api_view(["GET"])
+def test(request):
+    return Response("Hello, world!")
 
