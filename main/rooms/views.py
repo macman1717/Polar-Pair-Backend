@@ -213,9 +213,17 @@ def get_pairings(request, room_code, name):
         room = Room.objects.get(code=room_code)
         pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))[0]
         if pairing.participant1 == name:
-            return Response({"partner":pairing.participant2, "image":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant2,
+                             "image":base_url+room_code+"&"+pairing.participant2,
+                             "icebreaker":pairing.icebreaker,
+                             "confirmed":pairing.confirmed
+                             }, status=status.HTTP_200_OK)
         else:
-            return Response({"partner":pairing.participant1, "image":base_url+room_code+"&"+pairing.participant2, "icebreaker":pairing.icebreaker}, status=status.HTTP_200_OK)
+            return Response({"partner":pairing.participant1,
+                             "image":base_url+room_code+"&"+pairing.participant1,
+                             "icebreaker":pairing.icebreaker,
+                             "confirmed":pairing.confirmed
+                             }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
