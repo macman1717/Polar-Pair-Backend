@@ -215,19 +215,20 @@ def get_pairings(request, room_code, name):
         #     pairing = Pairing.objects.get(room=room, participant1=name)
         # except Pairing.DoesNotExist:
         #     pairing = Pairing.objects.get(room=room, participant2=name)
-        pairing = room.pairing_set.all().filter(Q(participant1=name) | Q(participant2 = name)).first()
-        if pairing.participant1 == name:
-            return Response({"partner":pairing.participant2,
-                             "image":base_url+room_code+"&"+pairing.participant2,
-                             "icebreaker":pairing.icebreaker,
-                             "confirmed":pairing.confirmed
-                             }, status=status.HTTP_200_OK)
-        else:
-            return Response({"partner":pairing.participant1,
-                             "image":base_url+room_code+"&"+pairing.participant1,
-                             "icebreaker":pairing.icebreaker,
-                             "confirmed":pairing.confirmed
-                             }, status=status.HTTP_200_OK)
+        pairing = room.pairing_set.all()
+        for pairing in pairing:
+            if pairing.participant1 == name:
+                return Response({"partner":pairing.participant2,
+                                 "image":base_url+room_code+"&"+pairing.participant2,
+                                 "icebreaker":pairing.icebreaker,
+                                 "confirmed":pairing.confirmed
+                                 }, status=status.HTTP_200_OK)
+            else:
+                return Response({"partner":pairing.participant1,
+                                 "image":base_url+room_code+"&"+pairing.participant1,
+                                 "icebreaker":pairing.icebreaker,
+                                 "confirmed":pairing.confirmed
+                                 }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
