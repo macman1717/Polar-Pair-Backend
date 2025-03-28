@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from main.rooms.models import Participant, Room, Pairing
+from .models import Participant, Room, Pairing
 
 env = environ.Env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -154,7 +154,7 @@ def create_pairings(request, room_code):
         return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_pairing(request, room_code, name):
+def get_pairings(request, room_code, name):
     try:
         room = Room.objects.get(code=room_code)
         pairing = room.pairing_set.filter(Q(participant1=name) | Q(participant2 = name))
