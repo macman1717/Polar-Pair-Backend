@@ -188,6 +188,15 @@ def create_pairings(request, room_code):
             icebreaker = prompt(interest1, interest2)
             room.pairing_set.create(participant1=participant1.name, participant2=participant2.name, icebreaker=icebreaker)
 
+            pairings = room.pairing_set.all()
+            pairings_list = []
+            for pairing in pairings:
+                pairings_list.append({
+                    "Person A": pairing.participant1,
+                    "Person B": pairing.participant2,
+                    "icebreaker": pairing.icebreaker
+                })
+            return Response({"pairings": pairings_list}, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -290,7 +299,7 @@ def prompt(interest1, interest2):
             {
                 "role": "user",
                 "content": f"""
-        "### INSTRUCTION ###
+        ### INSTRUCTION ###
         Generate ONLY the icebreaker question itself with:
         - No 'Person 1/Person 2' labels
         - No introductory phrases
@@ -309,18 +318,6 @@ def prompt(interest1, interest2):
         Generate exactly one icebreaker question for two people with separate interests:
         - Person A loves [{interest1}]
         - Person B loves [{interest2}]
-
-        Rules:
-        1. Output ONLY the question
-        2. No introductory phrases
-        3. Maximum 12 words
-        4. Connect their interests implicitly (no merged activities)
-
-        Bad example (violates rule #2):
-        'Here's a question: How would...'
-
-        Good example:
-        'How do soccer tactics compare to racing pit-stop strategies?'"
             """
             }
         ],
