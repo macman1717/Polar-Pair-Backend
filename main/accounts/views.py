@@ -15,7 +15,7 @@ def signup(request):
     password = data['password']
     try:
         user = User.objects.create_user(username=username, password=password)
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
     except IntegrityError:
         return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
