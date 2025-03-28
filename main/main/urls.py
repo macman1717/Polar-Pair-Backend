@@ -22,11 +22,11 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Polar Pair API",
       default_version='v1',
-      description="Test description",
+      description="Rest API created at USITCC as part of the Hackathon competition. Receives requests from the frontend and interacts with MongoDB, Google Cloud Storage, and Hugging Face's api to handle the requests.",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
+      contact=openapi.Contact(email="cgriffin10@ggc.edu"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,
@@ -38,7 +38,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("prompt/", include("prompts.urls")),
     path("account/", include("accounts.urls")),
     path("rooms/", include("rooms.urls")),
     path('api/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-redoc'),

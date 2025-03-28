@@ -71,10 +71,9 @@ def delete_room(request, room_code):
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_room(request, username, room_code):
+def get_room(reques, room_code):
     try:
-        user = User.objects.get(username=username)
-        room = user.room_set.get(code=room_code)
+        room = Room.objects.get(code=room_code)
         return Response({'code': 200, 'room_name': room.name})
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
