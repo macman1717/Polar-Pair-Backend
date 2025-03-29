@@ -128,7 +128,7 @@ def add_participant(request, room_code):
 
         blob.upload_from_file(file_obj=image_file, content_type='image/png')
 
-        return Response(status=status.HTTP_201_CREATED)
+        return Response({"image":base_url+room_code+"&"+participant_name},status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response(repr(e), status=status.HTTP_400_BAD_REQUEST)
 
