@@ -209,7 +209,7 @@ def create_pairings(request, room_code):
                      with and the icebreaker for the current round.
                      """)
 @api_view(['POST'])
-def get_pairings(request, room_code):
+def get_pairing(request, room_code):
     name = request.data.get('name')
     try:
         room = Room.objects.get(code=room_code)
