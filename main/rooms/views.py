@@ -188,18 +188,17 @@ def create_pairings(request, room_code):
             icebreaker = prompt(interest1, interest2)
             room.pairing_set.create(participant1=participant1.name, participant2=participant2.name, icebreaker=icebreaker)
 
-            pairings = room.pairing_set.all()
-            pairings_list = []
-            for pairing in pairings:
-                pairings_list.append({
-                    "Person1": pairing.participant1,
-                    "Person1_image": base_url+room_code+"&"+pairing.participant1,
-                    "Person2": pairing.participant2,
-                    "Person2_image":base_url+room_code+"&"+pairing.participant2,
-                    "icebreaker": pairing.icebreaker
-                })
-            return Response({"pairings": pairings_list}, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_201_CREATED)
+        pairings = room.pairing_set.all()
+        pairings_list = []
+        for pairing in pairings:
+            pairings_list.append({
+                "Person1": pairing.participant1,
+                "Person1_image": base_url+room_code+"&"+pairing.participant1,
+                "Person2": pairing.participant2,
+                "Person2_image":base_url+room_code+"&"+pairing.participant2,
+                "icebreaker": pairing.icebreaker
+            })
+        return Response({"pairings": pairings_list}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -221,7 +220,7 @@ def get_pairings(request, room_code, name):
                                  "icebreaker":pairing.icebreaker,
                                  "confirmed":pairing.confirmed
                                  }, status=status.HTTP_200_OK)
-            else:
+            elif pairing.participant2 == name:
                 return Response({"partner":pairing.participant1,
                                  "image":base_url+room_code+"&"+pairing.participant1,
                                  "icebreaker":pairing.icebreaker,
