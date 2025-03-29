@@ -202,7 +202,7 @@ def create_pairings(request, room_code):
     except Exception as e:
         return Response({'error': repr(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(method='get',
+@swagger_auto_schema(method='post',
                      operation_id='get_pairing',
                      operation_description="""
                      returns pairings associated with the room + name. Used by participants to see who they were paired
