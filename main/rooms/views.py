@@ -208,8 +208,9 @@ def create_pairings(request, room_code):
                      returns pairings associated with the room + name. Used by participants to see who they were paired
                      with and the icebreaker for the current round.
                      """)
-@api_view(['GET'])
-def get_pairings(request, room_code, name):
+@api_view(['POST'])
+def get_pairings(request, room_code):
+    name = request.data.get('name')
     try:
         room = Room.objects.get(code=room_code)
         pairings = room.pairing_set.all()
